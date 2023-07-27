@@ -10,30 +10,30 @@ type Artist = OASOutput<
   "200"
 >;
 
+async function fetchArtist() {
+  const response = await client["/artists/{id}"].get({
+    params: { id: "1KCSPY1glIKqW2TotWuXOR" },
+    headers: {
+      Authorization: `Bearer ${import.meta.env.VITE_APP_SPOTIFY_TOKEN}}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Something went wrong");
+  }
+
+  const artist = await response.json();
+
+  return artist;
+}
+
 function App() {
   const [artist, setArtist] = useState<Artist>();
 
   useEffect(() => {
-    client["/artists/{id}"]
-      .get({
-        params: { id: "1KCSPY1glIKqW2TotWuXOR" },
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_APP_SPOTIFY_TOKEN}}`,
-        },
-      })
-      .then((res) => {
-        if (res.ok) {
-          return res.json();
-        }
-
-        throw new Error("Something went wrong");
-      })
-      .then((artist) => {
-        setArtist(artist);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    fetchArtist()
+      .then((a) => setArtist(a))
+      .catch(console.error);
   }, []);
 
   if (!artist) {
